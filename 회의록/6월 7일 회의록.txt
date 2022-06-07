@@ -28,3 +28,4 @@
 회의내용
 경민 : feature selection으로 상관있는 feature만 정해보기
 경민 : model code 공유하기
+경민 : 온도 음수값을 제거하기 위해 섭씨 온도를 화씨 온도로 바꿔보기
