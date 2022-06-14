@@ -1,0 +1,5 @@
+모델만 바꿔보았음
+
+first : svm(rental ~ ., data = train_data, type = 'eps-regression', kernel = 'radial', gamma = '0.1', cost = '1', epsilon = '0.11')
+
+second : svm(rental ~ ., data = train_data, type = 'eps-regression', kernel = 'radial') 
