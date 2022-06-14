@@ -22,8 +22,8 @@ replace <- function(x) {
   return(x)
 }
 
-MAE <- function(actual, predicted) {
-  mean(abs(actual - predicted))
+NMAE <- function(actual, predicted) {
+  return(mean(abs(actual - predicted)/actual))
 }
 
 # 데이터
@@ -192,30 +192,52 @@ df[!complete.cases(df),"PM2.5"] <- ifelse(df[!complete.cases(df),"season"]=="봄
                                                          ifelse(df[!complete.cases(df),"season"]=="가을", agg$PM2.5[3], agg$PM2.5[4])))
 
 df[!complete.cases(df),"sunshine_sum"] <- ifelse(df[!complete.cases(df),"season"]=="봄", agg$sunshine_sum[1],
-                                                  ifelse(df[!complete.cases(df),"season"]=="여름", agg$sunshine_sum[2],
+                     
+                                                                              ifelse(df[!complete.cases(df),"season"]=="여름", agg$sunshine_sum[2],
                                                          ifelse(df[!complete.cases(df),"season"]=="가을", agg$sunshine_sum[3], agg$sunshine_sum[4])))
 training(df)
 
-ins_model <- lm(rental~., data=df)
+# real_try
+df <- read.csv("new_data.csv")
+df2 <- read.csv("new_data2.csv")
+df[,1] <- as.Date(df[,1])
+df2[,1] <- as.Date(df2[,1])
+
+df[,14] <- as.numeric(df[,14]) # 평일=1, 주말=2
+df[,15] <- as.numeric(df[,15]) # 봄=1, 여름=2, 가을=3, 겨울=4
+df[,14] <- factor(df[,14], labels=c("평일","주말"))
+df[,15] <- factor(df[,15], labels=c("봄","여름","가을","겨울"))
+
+df2[,14] <- factor(df2[,14], levels=c("평일","주말"))
+df2[,15] <- factor(df2[,15], levels=c("봄","여름","가을","겨울"))
+
+train_idx <- sample(1:nrow(df), size=360, replace=F)
+train <- df[train_idx,]
+test <- df[-train_idx,]
+
+
+ins_model <- lm(rental~., data=train)
 print(ins_model)
 summary(ins_model)
 
-df_tmp <- df
-df_tmp$precipitation2 <- df$precipitation^2
-
-model <- lm(rental~., data=df_tmp)
+train$precipitation2 <- train$precipitation^2
+test$precipitation2 <- test$precipitation^2
+model <- lm(rental~., data=train)
 model2 <- stepAIC(model)
 
 summary(model)
 summary(model2)
 
-model <- lm(rental~., data=df)
-model2 <- stepAIC(model)
-
+pred <- predict(model2, test)
+pred <- round(abs(pred))
+NMAE(test$rental, pred)
 df_tmp$pred <- predict(model2, df_tmp)
-cor(df_tmp$pred, df_tmp$rental)
-plot(df_tmp$pred, df_tmp$rental)
+
+cor(pred, test$rental)
+plot(pred, test$rental)
 abline(a=0, b=1, col="red", lwd=3, lty=2)
 
 write.csv(df, file="new_data.csv", row.names=F)
 write.csv(df_tmp, file="new_data2.csv", row.names=F)
+
+# norm
