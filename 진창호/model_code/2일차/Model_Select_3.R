@@ -16,6 +16,9 @@ sunshine_dataset[is.na(sunshine_dataset$sunshine_sum), 'sunshine_sum'] <- 0
 summary(sunshine_dataset)
 
 # train_data precipitation 전처리하기 (humidity로 예상해보기)
+# install.packages('kernlab')
+library('e1071')
+
 precipitation_check_dataset <- sunshine_dataset[!is.na(sunshine_dataset$precipitation), ]
 cor.test(precipitation_check_dataset$precipitation, precipitation_check_dataset$temp_mean)
 cor.test(precipitation_check_dataset$precipitation, precipitation_check_dataset$humidity)
@@ -54,10 +57,12 @@ summary(train_data)
 # 1번 : 강우량, 평균 온도, 미세먼지, 초미세먼지, 습도, 일조율, 평균 바람, 대여량
 train_data <- train_data[, c(2, 3, 6, 7, 8, 10, 11, 13)]
 
+# train_data 출력
+# write.csv(train_data, "1st_train_jin.csv", row.names = FALSE)
+
 # test_data feature 뽑기
 date <- test_data[1]
 test_data <- test_data[, c(2, 3, 6, 7, 8, 10, 11)]
-test_data$sunshine_sum[is.na(test_data$sunshine_sum)] <- 0
 
 # test_data precipitation 전처리하기 (train precipitation 전처리에 사용한 모델로 예측하기)
 humid_data <- as.data.frame(test_data[is.na(test_data$precipitation), ]$humidity)
@@ -67,6 +72,9 @@ predict_data <- round(predict_data, 1)
 test_data[is.na(test_data$precipitation), ] <- predict_data
 str(test_data)
 summary(test_data)
+
+# test_data 출력
+# write.csv(test_data, "1st_test_jin.csv", row.names = FALSE)
 
 # install.packages('kernlab')
 library('e1071')

@@ -15,6 +15,8 @@ train_data <- dataset[3:13]
 train_data <- na.omit(pre_dataset) # 74개 데이터가 날아감
 str(train_data)
 
+# train_data 출력
+# write.csv(train_data, "1st_train_jin.csv", row.names = FALSE)
 
 # test_data 가장 단순한 전처리(data, precipation 열 날리기 / NA 행 sunshine_sum 0으로 채우기 / 자동 정규화(scale)) 
 date <- test_data[1]
@@ -22,6 +24,9 @@ test_data <- test_data[3:12]
 test_data$sunshine_sum[is.na(test_data$sunshine_sum)] <- 0
 str(test_data)
 summary(test_data)summary(train_data)
+
+# test_data 출력
+# write.csv(test_data, "1st_test_jin.csv", row.names = FALSE)
 
 # install.packages('kernlab')
 library('e1071')
