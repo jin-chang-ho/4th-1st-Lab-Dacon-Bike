@@ -2,6 +2,13 @@
 setwd("C:/Users/HJK/Desktop/lab/Dacon_Seoul_Bike/HJK/data")
 df <- read.csv("new_data.csv")
 
+library(MASS)
+
+NMAE <- function(actual, predicted) {
+  return(mean(abs(actual - predicted)/actual))
+}
+
+
 df[,1] <- as.Date(df[,1])
 
 for (i in 1:nrow(df)) {
