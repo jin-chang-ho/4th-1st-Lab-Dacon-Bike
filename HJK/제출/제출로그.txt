@@ -1,0 +1,3 @@
+첫 번째
+model <- svm(rental~., data=train, type='nu-regression', kernel='radial')
+
