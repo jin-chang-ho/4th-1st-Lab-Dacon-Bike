@@ -52,16 +52,15 @@ precipitation_dataset <- precipitation_dataset[!is.na(precipitation_dataset$PM10
 train_data <- precipitation_dataset[!is.na(precipitation_dataset$PM2.5), ]
 summary(train_data)
 
-# train_data feature 뽑기
-# 1번 : 강우량, 평균 온도, 미세먼지, 초미세먼지, 습도, 일조율, 평균 바람, 대여량
-train_data <- train_data[, c(2, 3, 6, 7, 8, 10, 11, 13)]
+# train_data feature 출력
+train_data <- train_data[2:13]
 
 # train_data 출력
 # write.csv(train_data, "1st_train_jin.csv", row.names = FALSE)
 
-# test_data feature 뽑기
+# test_data sunshine_sum 전처리하기 (sunshine_rate가 0이면 sunshine_sum을 0으로 처리함 - 일리있음)
 date <- test_data[1]
-test_data <- test_data[, c(2, 3, 6, 7, 8, 10, 11)]
+test_data[is.na(test_data$sunshine_sum), 'sunshine_sum'] <- 0
 
 # test_data precipitation 전처리하기 (train precipitation 전처리에 사용한 모델로 예측하기)
 humid_data <- as.data.frame(test_data[is.na(test_data$precipitation), ]$humidity)
@@ -71,6 +70,9 @@ predict_data <- round(predict_data, 1)
 test_data[is.na(test_data$precipitation), ] <- predict_data
 str(test_data)
 summary(test_data)
+
+# test_data feature 뽑기
+test_data <- test_data[2:12]
 
 # test_data 출력
 # write.csv(test_data, "1st_test_jin.csv", row.names = FALSE)
@@ -89,4 +91,4 @@ result <- round(result)
 submission <- data.frame(date = date, rental = result)
 # write.csv(submission, "1st_submission_jin.csv", row.names = FALSE)
 
-# 0.620
+# 0.645
