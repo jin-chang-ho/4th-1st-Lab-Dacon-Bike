@@ -19,17 +19,23 @@ load_test <- function() {
 }
 
 
-kfold <- function(classifier, ds, fold) {
+kfold <- function(classifier, ds, cl, fold) {
   acc <- c() #fold별acc 저장
   for (i in 1:5) {
     ts.idx<-fold$subset[which(fold$which==i)]
     ds.train <- ds[-ts.idx, ]
     ds.test <-  ds[ts.idx, ]
+    cl.train <- cl[-ts.idx]
+    cl.test <- cl[ts.idx]
     
     if (classifier == 'svm') {
+      
       model <- svm(rental~., data=ds.train, type='eps-regression', kernel='radial')
       pred <- predict(model, ds.test[, -12])
       acc[i] <- NMAE(ds.test$rental,pred)
+    }
+    else if (classifier == 'xgb') {
+      acc[i] <- XgBoost(ds.train, ds.test, cl.train, cl.test)
     }
     
   }
@@ -37,29 +43,19 @@ kfold <- function(classifier, ds, fold) {
   
 }
 
-XgBoost <- function(df, cl, fold=5) {
+XgBoost <- function(ds.tr, ds.ts, cl.tr, cl.ts) {
   set.seed(100)
-  train_set <- df
-  test_set <- cl
-  x_train <- train_set %>%
-    select(-rental, -date) %>%
+  x_train <- ds.tr %>%
     as.matrix()
   
-  y_train <- train_set$rental
+  y_train <- cl.tr
   
-  x_test <- test_set %>%
-    select(-date) %>%
+  x_test <- ds.ts %>%
     as.matrix()
+  
+  y_test <- cl.ts
   
   dtrain <- xgb.DMatrix(x_train, label=y_train)
-  
-  searchGridSubCol <- expand.grid(subsample=c(0.5, 0.6),
-                                  colsample_bytree=c(0.5, 0.6),
-                                  max_depth=c(7:15),
-                                  min_child=seq(1),
-                                  eta=c(0.05, 0.1, 0.15)
-  )
-  ntrees <- 10
   
   model <- xgb.train(
     data=dtrain,
@@ -75,7 +71,7 @@ XgBoost <- function(df, cl, fold=5) {
     xgb.plot.importance()
   
   pred <- predict(model, x_test)
-  
   pred <- round(pred)
-  return(pred)
+  
+  return(NMAE(y_test, pred))
 }
