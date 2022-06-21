@@ -75,3 +75,31 @@ XgBoost <- function(ds.tr, ds.ts, cl.tr, cl.ts) {
   
   return(NMAE(y_test, pred))
 }
+
+XGB.real_test <- function(ds.tr, ds.ts, cl.tr) {
+  x_train <- ds.tr %>%
+    as.matrix()
+  y_train <- cl.tr
+  y_test <- ds.ts %>%
+    as.matrix()
+  
+  dtrain <- xgb.DMatrix(x_train, label=y_train)
+  
+  model <- xgb.train(
+    data=dtrain,
+    max_depth=10,
+    nround=150,
+    eta=0.15,
+    subsample=0.6,
+    colsample_bytree=0.6,
+    min_child_weight=1
+  )
+  
+  xgb.importance(feature_names=colnames(x_train), model) %>%
+    xgb.plot.importance()
+  
+  pred <- predict(model, y_test)
+  pred <- round(pred)
+  
+  return(pred)
+}

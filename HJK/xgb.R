@@ -159,8 +159,62 @@ season <- c("Spring","Summer","Fall","Winter")
 for(i in 1:4) {
   cat(season[i], "\t:\t",result[i],"\n")
 }
-#봄에는 성능이 좋지 않지만 여름과 가을은 많이 향상된 모습을 보임
+#봄에는 성능이 좋지 않지만 여름과 가을은 많이 향상된 모습을 보임, 겨울은 약간의 향상
 #Spring 	:	 0.3150763 
 #Summer 	:	 0.1273231 
 #Fall 	:	 0.1210844 
 #Winter 	:	 0.1798596
+
+
+# 실제 시도
+# 봄만 전체로 학습 후 예측, 나머지는 계절 별 모델로 예측
+ts.spring <- test[which(test$season.Spring == 2),]
+ts.summer <- test[which(test$season.Summer == 2),]
+ts.fall <- test[which(test$season.Fall == 2), ]
+ts.winter <- test[which(test$season.Winter == 2), ]
+
+tr.summer <- ds.summer %>%
+  select(-rental, -date)
+cl.summer <- ds.summer$rental
+ts.sum <- ts.summer %>%
+  select(-date)
+pred.summer <- XGB.real_test(tr.summer, ts.sum, cl.summer)
+
+tr.fall <- ds.fall %>%
+  select(-rental, -date)
+cl.fall <- ds.fall$rental
+ts.fa <- ts.fall %>%
+  select(-date)
+pred.fall <- XGB.real_test(tr.fall, ts.fa, cl.fall)
+
+tr.winter <- ds.winter %>%
+  select(-rental, -date)
+cl.winter <- ds.winter$rental
+ts.win <- ts.winter %>%
+  select(-date)
+pred.winter <- XGB.real_test(tr.winter, ts.win, cl.winter)
+
+tr.spring <- df %>%
+  select(-rental, -date)
+cl.spring <- df$rental
+ts.spr <- ts.spring %>%
+  select(-date)
+pred.spring <- XGB.real_test(tr.spring, ts.spr, cl.spring)
+
+df.spr <- data.frame(date=ts.spring$date, rental=pred.spring)
+df.sum <- data.frame(date=ts.summer$date, rental=pred.summer)
+df.fa <- data.frame(date=ts.fall$date, rental=pred.fall)
+df.win <- data.frame(date=ts.winter$date, rental=pred.winter)
+
+bindAllSeason <- rbind(df.spr, df.sum, df.fa, df.win)
+
+submit <- read.csv("sample_submission.csv")
+submit$date <- as.Date(submit$date)
+
+for (i in 1:nrow(bindAllSeason)) {
+  temp <- bindAllSeason[i, 1]
+  submit[which(submit$date == temp), 2] <- bindAllSeason[i, 2]
+}
+head(submit)
+
+write.csv(submit, "sample_submission4.csv", row.names=F)
