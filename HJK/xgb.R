@@ -103,8 +103,10 @@ for (i in 1:8) {
 for(i in 1:8) {
   cat("case", i, "\t:\t",res[i],"\n")
 }
-df[14:19] <- df[, 14:19] +1 
 
+
+
+# 계절 별 예측 시도
 ds.spring <- df[which(df$season.Spring == 2),]
 ds.summer <- df[which(df$season.Summer == 2),]
 ds.fall <- df[which(df$season.Fall == 2), ]
@@ -119,7 +121,6 @@ tr.fall <- sample(1:nrow(ds.fall), nrow(ds.fall)*3/4, replace=F)
 set.seed(100)
 tr.win <- sample(1:nrow(ds.winter), nrow(ds.winter)*3/4, replace=F)
 
-# 계절 별 예측 시도
 se.tr1 <- ds.spring[tr.spr,] %>%
   select(-rental, -date)
 se.cl1 <- ds.spring[tr.spr, ]$rental
