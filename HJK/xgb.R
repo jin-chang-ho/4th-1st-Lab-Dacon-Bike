@@ -95,6 +95,7 @@ res <- c()
 for (i in 1:8) {
   tr <- get(paste0("tr", i))
   cl <- get(paste0("cl", i))
+  set.seed(100)
   fold <- cvFolds(nrow(tr), K=5)
   res[i] <- kfold('xgb',tr, cl, fold)
 }
@@ -102,3 +103,63 @@ for (i in 1:8) {
 for(i in 1:8) {
   cat("case", i, "\t:\t",res[i],"\n")
 }
+df[14:19] <- df[, 14:19] +1 
+
+ds.spring <- df[which(df$season.Spring == 2),]
+ds.summer <- df[which(df$season.Summer == 2),]
+ds.fall <- df[which(df$season.Fall == 2), ]
+ds.winter <- df[which(df$season.Winter == 2), ]
+
+set.seed(100)
+tr.spr <- sample(1:nrow(ds.spring), nrow(ds.spring)*3/4, replace=F)
+set.seed(100)
+tr.sum <- sample(1:nrow(ds.summer), nrow(ds.summer)*3/4, replace=F)
+set.seed(100)
+tr.fall <- sample(1:nrow(ds.fall), nrow(ds.fall)*3/4, replace=F)
+set.seed(100)
+tr.win <- sample(1:nrow(ds.winter), nrow(ds.winter)*3/4, replace=F)
+
+# 계절 별 예측 시도
+se.tr1 <- ds.spring[tr.spr,] %>%
+  select(-rental, -date)
+se.cl1 <- ds.spring[tr.spr, ]$rental
+se.ts1 <- ds.spring[-tr.spr,] %>%
+  select(-rental, -date)
+se.ts.cl1 <- ds.spring[-tr.spr,]$rental
+
+se.tr2 <- ds.summer[tr.sum,] %>%
+  select(-rental, -date)
+se.cl2 <- ds.summer[tr.sum, ]$rental
+se.ts2 <- ds.summer[-tr.sum,] %>%
+  select(-rental, -date)
+se.ts.cl2 <- ds.summer[-tr.sum,]$rental
+
+se.tr3 <- ds.fall[tr.fall,] %>%
+  select(-rental, -date)
+se.cl3 <- ds.fall[tr.fall, ]$rental
+se.ts3 <- ds.fall[-tr.fall,] %>%
+  select(-rental, -date)
+se.ts.cl3 <- ds.fall[-tr.fall,]$rental
+
+se.tr4 <- ds.winter[tr.win,] %>%
+  select(-rental, -date)
+se.cl4 <- ds.winter[tr.win, ]$rental
+se.ts4 <- ds.winter[-tr.win,] %>%
+  select(-rental, -date)
+se.ts.cl4 <- ds.winter[-tr.win,]$rental
+
+result <- c()
+result[1] <- XgBoost(se.tr1, se.ts1, se.cl1, se.ts.cl1)
+result[2] <- XgBoost(se.tr2, se.ts2, se.cl2, se.ts.cl2)
+result[3] <- XgBoost(se.tr3, se.ts3, se.cl3, se.ts.cl3)
+result[4] <- XgBoost(se.tr4, se.ts4, se.cl4, se.ts.cl4)
+
+season <- c("Spring","Summer","Fall","Winter")
+for(i in 1:4) {
+  cat(season[i], "\t:\t",result[i],"\n")
+}
+#봄에는 성능이 좋지 않지만 여름과 가을은 많이 향상된 모습을 보임
+#Spring 	:	 0.3150763 
+#Summer 	:	 0.1273231 
+#Fall 	:	 0.1210844 
+#Winter 	:	 0.1798596
