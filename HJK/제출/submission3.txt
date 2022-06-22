@@ -1,0 +1,4 @@
+3번째 제출
+xgb.R
+최종 0.41 추가적인 조치 필요
+결과 파일은 sample_submission3.csv
