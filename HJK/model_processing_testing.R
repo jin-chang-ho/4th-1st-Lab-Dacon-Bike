@@ -126,7 +126,7 @@ prec.model <- svm(precipitation~., data=prec.tr, type='eps-regression', kernel='
 prec.na <- new.df[is.na(new.df$precipitation), -2]
 new.df[is.na(new.df$precipitation), 2] <- round(predict(prec.model, prec.na), 1)
 
-new.df[new.df$precipitation < 1,2] <- 0
+new.df[new.df$precipitation < 0,2] <- 0
 summary(new.df)
 
 
