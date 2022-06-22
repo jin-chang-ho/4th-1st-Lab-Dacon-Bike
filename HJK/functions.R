@@ -6,7 +6,6 @@ load_df <- function() {
   setwd("C:/Users/HJK/Desktop/lab/Dacon_Seoul_Bike/HJK/data")
   df <- read.csv("real_data.csv")
   df$date <- as.Date(df$date)
-  df[,14:19] <- lapply(df[,14:19], as.factor)
   return(df)
 }
 
@@ -14,7 +13,6 @@ load_test <- function() {
   setwd("C:/Users/HJK/Desktop/lab/Dacon_Seoul_Bike/HJK/data")
   test <- read.csv("test_filled.csv")
   test$date <- as.Date(test$date)
-  test[,13:18] <- lapply(test[,13:18], as.factor)
   return(test)
 }
 
