@@ -47,7 +47,6 @@ tmp <- tmp[which(tmp$date %in% df$date),]
 tmp[which(tmp$date %in% df$date), c("weekday.Weekday","weekday.Holiday","season.Spring","season.Summer","season.Fall","season.Winter")] <- df[which(tmp$date %in% df$date), 14:19]
 tmp[which(tmp$date %in% df$date), 2] <- df[which(tmp$date %in% df$date), 2]
 tmp[, 14:19] <- lapply(tmp[, 14:19], as.numeric)
-tmp[, 14:19] <- tmp[, 14:19] - 1
 
 
 # dataset 1: 미세먼지와 초미세먼지 NA 행 제거, 강수량 포함해서 예측

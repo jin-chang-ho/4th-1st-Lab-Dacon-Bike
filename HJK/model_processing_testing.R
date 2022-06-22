@@ -44,7 +44,6 @@ new.df <- data.frame(predict(dummy, newdata=df.raw))
 new.df[,14:19] <- lapply(new.df[,14:19], as.factor)
 new.df$date <- df.raw$date
 
-
 train_idx <- sample(1:nrow(df), size=3*round(nrow(df)/4), replace=F)
 train <- df[train_idx,]
 test <- df[-train_idx, -13]
