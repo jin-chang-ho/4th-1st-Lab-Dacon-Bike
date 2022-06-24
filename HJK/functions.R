@@ -57,10 +57,10 @@ XgBoost <- function(ds.tr, ds.ts, cl.tr, cl.ts) {
   
   model <- xgb.train(
     data=dtrain,
-    max_depth=10,
+    max_depth=8,
     nround=150,
-    eta=0.15,
-    subsample=0.6,
+    eta=0.05,
+    subsample=0.5,
     colsample_bytree=0.6,
     min_child_weight=1
   )
@@ -100,4 +100,27 @@ XGB.real_test <- function(ds.tr, ds.ts, cl.tr) {
   pred <- round(pred)
   
   return(pred)
+}
+
+normalize <- function(x) {
+  return ((x - min(x)) / (max(x) - min(x)))
+}
+
+z_normalize <- function(x) {
+  return((x-mean(x)) / sd(x))
+}
+
+MAE_FUN <- function(actual, predicted) {
+  return(mean(abs(actual - predicted)))
+}
+
+gen_submitssion_file <- function(pred) {
+  setwd("C:/Users/HJK/Desktop/lab/Dacon_Seoul_Bike/HJK/data/submit_data")
+  submit <- read.csv('sample_submission.csv')
+  submit$rental <- pred
+  data_dir <- c("C:/Users/HJK/Desktop/lab/Dacon_Seoul_Bike/HJK/data/submit_data/")
+  data_list <- list.files(data_dir)
+  l <- length(data_list)
+  file_name <- paste0('submission',l,'.csv')
+  write.csv(submit, file_name, row.names=F)
 }
