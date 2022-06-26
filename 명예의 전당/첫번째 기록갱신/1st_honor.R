@@ -68,6 +68,9 @@ prec.na <- new.df[is.na(new.df$precipitation), -2]
 new.df[is.na(new.df$precipitation), 2] <- round(predict(prec.model, prec.na), 1)
 new.df[new.df$precipitation < 0,2] <- 0
 
+# best_train.csv 저장
+write.csv(new.df, "best_train.csv", row.names = FALSE)
+
 # test data 불러오기
 test.raw <- read.csv("C:\\Users\\Windows\\Desktop\\대학교\\연구실\\DACON\\데이터셋\\test.csv")
 
@@ -92,7 +95,6 @@ test.raw$season <- factor(test.raw$season, levels=c("Spring","Summer","Fall","Wi
 # test sunshine_sum 전처리
 test.raw[is.na(test.raw$sunshine_sum), 9] <- mean(test.raw$sunshine_sum, na.rm=T)
 
-
 # test.raw season, sum 이진화
 dummy <- dummyVars("~.", data=test.raw)
 test.raw <- data.frame(predict(dummy, newdata=test.raw))
@@ -104,6 +106,9 @@ prec.model <- svm(precipitation ~ ., data=prec.tr, type='eps-regression', kernel
 test.raw.na <- test.raw[is.na(test.raw$precipitation), -2]
 test.raw[is.na(test.raw$precipitation), 2] <- round(predict(prec.model, test.raw.na), 1)
 test.raw[test.raw$precipitation < 0, 2] <- 0
+
+# best_test.csv 저장
+write.csv(test.raw, "best_test.csv", row.names = FALSE)
 
 # 모델 생성과 예측
 train <- new.df[,]
